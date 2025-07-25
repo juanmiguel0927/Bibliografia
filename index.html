@@ -27,35 +27,26 @@
             font-size: 2.25rem; /* text-4xl */
             font-weight: 700; /* font-bold */
         }
-        .search-input {
+        .search-input, .filter-select, .style-select {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.3s ease;
+            background-color: #fff; /* Ensure background for select elements */
         }
-        .search-input:focus {
+        .search-input:focus, .filter-select:focus, .style-select:focus {
             outline: none;
             border-color: #3b82f6; /* blue-500 */
         }
-        .filter-select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: #fff;
-            appearance: none; /* Remove default arrow */
+        /* Custom arrow for select elements */
+        .filter-select, .style-select {
+            appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%234A5568%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1em;
-            transition: border-color 0.3s ease;
-        }
-        .filter-select:focus {
-            outline: none;
-            border-color: #3b82f6; /* blue-500 */
         }
         .bibliography-list {
             margin-top: 2rem;
@@ -88,14 +79,20 @@
             border-radius: 8px;
             margin-top: 2rem;
         }
-        .grid-cols-1-md-2 {
+        /* Responsive grid for filters and search */
+        .grid-cols-1-md-2-lg-3 {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
         }
         @media (min-width: 768px) {
-            .grid-cols-1-md-2 {
+            .grid-cols-1-md-2-lg-3 {
                 grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (min-width: 1024px) {
+            .grid-cols-1-md-2-lg-3 {
+                grid-template-columns: 1fr 1fr 1fr;
             }
         }
     </style>
@@ -104,7 +101,7 @@
     <div class="container">
         <h1 class="header">Base de Datos de Bibliografía</h1>
 
-        <div class="grid-cols-1-md-2 gap-4 mb-6">
+        <div class="grid-cols-1-md-2-lg-3 gap-4 mb-6">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Buscar:</label>
                 <input type="text" id="search" placeholder="Buscar por autor, título o editorial..." class="search-input">
@@ -118,6 +115,15 @@
                     <option value="publisher">Editorial/Lugar</option>
                 </select>
             </div>
+            <div>
+                <label for="citation-style" class="block text-sm font-medium text-gray-700 mb-2">Estilo de Citación:</label>
+                <select id="citation-style" class="style-select">
+                    <option value="original">Original</option>
+                    <option value="apa7">APA 7ma Edición</option>
+                    <option value="chicago">Chicago (Notas y Bibliografía)</option>
+                    <option value="icontec">ICONTEC</option>
+                </select>
+            </div>
         </div>
 
         <div id="bibliography-list" class="bibliography-list">
@@ -126,39 +132,39 @@
     </div>
 
     <script>
-        // Datos de la bibliografía extraídos del HTML proporcionado
+        // Datos de la bibliografía extraídos del HTML proporcionado con correcciones ortográficas
         const bibliographyData = [
-            { author: "Hindemith, P.", title: "Armonia Vol 1.", publisher: "Buenos Aires: Ricordi Americana.", year: "2009" },
+            { author: "Hindemith, P.", title: "Armonía Vol 1.", publisher: "Buenos Aires: Ricordi Americana.", year: "2009" },
             { author: "Mancini, H.", title: "Sounds And Scores.", publisher: "Omnibus Music Sales Limited.", year: "1997" },
-            { author: "Adler, J.", title: "Wheels Within Wheels A Stude Of Rhythm.", publisher: "", year: "2011" },
-            { author: "Adler, S.", title: "El Estudio de la orquestacion.", publisher: "Idea Books, S.A.", year: "2006" },
-            { author: "Aguilar, M. d.", title: "Estructuras de la sintaxis musical.", publisher: "Centro cultural ciudad de buenos aires departamento de musica, sonido e imagen, Buenos Aires.", year: "1989" },
+            { author: "Adler, J.", title: "Wheels Within Wheels A Study Of Rhythm.", publisher: "", year: "2011" },
+            { author: "Adler, S.", title: "El Estudio de la orquestación.", publisher: "Idea Books, S.A.", year: "2006" },
+            { author: "Aguilar, M. d.", title: "Estructuras de la sintaxis musical.", publisher: "Centro cultural ciudad de buenos aires departamento de música, sonido e imagen, Buenos Aires.", year: "1989" },
             { author: "Aldwell, E., Schachter, C., & Cadwallader, A.", title: "Harmony & Voice Leading (4th edition).", publisher: "Boston: Schirmer, Cengage Learning.", year: "2011" },
             { author: "Antokoletz, E.", title: "La Música De Béla Bartók. Un estudio De La Tonalidad Y La Progresión En La Música Del Siglo XX.", publisher: "Barcelona: Idea Books, S.A.", year: "2006" },
-            { author: "Arbonés, J., & Milrud, P.", title: "La Armonia Es Numerica.", publisher: "Barcelona: RBA Libros, S.A.", year: "2011" },
+            { author: "Arbonés, J., & Milrud, P.", title: "La Armonía Es Numérica.", publisher: "Barcelona: RBA Libros, S.A.", year: "2011" },
             { author: "Astor, M.", title: "Contrapunto Para Hoy.", publisher: "Caracas: Universidad Nacional Experimental De Las Artes - Unearte.", year: "2013" },
             { author: "Astor, M.", title: "Armonía Para Hoy.", publisher: "Caracas: Ediciones De La Biblioteca Universidad Central De Venezuela EBUC.", year: "2016" },
             { author: "Bach, J. S.", title: "371 Four-Part Chorales BWV 253-438.", publisher: "Leipzig: Breitkopf & Härtel.", year: "n.d." },
-            { author: "Balsach, L.", title: "Los Fundamentos De Las Tensiones Armónicas.", publisher: "Barcelona: Editorial De Musica Boileau.", year: "2016" },
-            { author: "Barrio, A.", title: "Tratado De Armonía Teoria Y Practica Vol 1.", publisher: "Madrid: Musicinco.", year: "1986" },
-            { author: "Barrio, A.", title: "Tratado De Armonía Teoria Y Practica Vol 2.", publisher: "Madrid: Musicinco.", year: "1990" },
-            { author: "Barrio, A.", title: "Tratado De Armonía Teoria Y Practica Vol 3.", publisher: "Madrid: Musicinco.", year: "1994" },
+            { author: "Balsach, L.", title: "Los Fundamentos De Las Tensiones Armónicas.", publisher: "Barcelona: Editorial De Música Boileau.", year: "2016" },
+            { author: "Barrio, A.", title: "Tratado De Armonía Teoría Y Práctica Vol 1.", publisher: "Madrid: Musicinco.", year: "1986" },
+            { author: "Barrio, A.", title: "Tratado De Armonía Teoría Y Práctica Vol 2.", publisher: "Madrid: Musicinco.", year: "1990" },
+            { author: "Barrio, A.", title: "Tratado De Armonía Teoría Y Práctica Vol 3.", publisher: "Madrid: Musicinco.", year: "1994" },
             { author: "Bennett, R.", title: "Léxico De Música.", publisher: "Madrid: Akal.", year: "2003" },
-            { author: "Bonet, N.", title: "Los Principios Fundametales De La Armonia.", publisher: "Barcelona: Dinsic Publicaciones Musicales, S.L.", year: "2008" },
+            { author: "Bonet, N.", title: "Los Principios Fundamentales De La Armonía.", publisher: "Barcelona: Dinsic Publicaciones Musicales, S.L.", year: "2008" },
             { author: "Brant , H.", title: "Textures And Timbres: An Orchestrator's Handbook.", publisher: "New York: Carl Fischer.", year: "2009" },
-            { author: "Brouwer, L.", title: "Síntesis De La Armonía Contemporánea. .", publisher: "Habana: Instituto Cubano del Libro .", year: "1972" },
-            { author: "Cáles Otero, F.", title: "Tratado De Contrapunto. I Contrapunto Severo.", publisher: "Madrid: Musica Didactica. S.L.", year: "1997" },
-            { author: "Calés Otero, F.", title: "Tratado De Contrapunto. II. Teoria General.", publisher: "Madrid: Musica Didactica. S.L.", year: "1997" },
-            { author: "Camacho, C.", title: "Armonia E Instrumentacion.", publisher: "Madrid: Real Musical.", year: "1993" },
-            { author: "Casella, A., & Mortari, V.", title: "La Tecnica De La Orquesta Contemporanea.", publisher: "Buenos Aires: Ricordi Americana S.A.E.C.", year: "1950" },
-            { author: "Catalán , T., & Fernández Vidal, C.", title: "Musica No Tonal. Las Propuestas de Julien Falk y Ernst Krenek.", publisher: "Universitat de València.", year: "2012" },
+            { author: "Brouwer, L.", title: "Síntesis De La Armonía Contemporánea.", publisher: "Habana: Instituto Cubano del Libro .", year: "1972" },
+            { author: "Cáles Otero, F.", title: "Tratado De Contrapunto. I Contrapunto Severo.", publisher: "Madrid: Música Didáctica. S.L.", year: "1997" },
+            { author: "Calés Otero, F.", title: "Tratado De Contrapunto. II. Teoría General.", publisher: "Madrid: Música Didáctica. S.L.", year: "1997" },
+            { author: "Camacho, C.", title: "Armonía E Instrumentación.", publisher: "Madrid: Real Musical.", year: "1993" },
+            { author: "Casella, A., & Mortari, V.", title: "La Técnica De La Orquesta Contemporánea.", publisher: "Buenos Aires: Ricordi Americana S.A.E.C.", year: "1950" },
+            { author: "Catalán , T., & Fernández Vidal, C.", title: "Música No Tonal. Las Propuestas de Julien Falk y Ernst Krenek.", publisher: "Universitat de València.", year: "2012" },
             { author: "Catalán, T.", title: "Sistemas Compositivos Temperados En El Siglo XX.", publisher: "Valencia: Piles.", year: "2012" },
             { author: "Charles Soler, A.", title: "Instrumentación y orquestación clásica y contemporánea. Vol 2: Percusión y teclado.", publisher: "Impromptu Editores, S.L.", year: "2005" },
             { author: "Charles Soler, A.", title: "Instrumentación y orquestación. Libro de trabajos + 2 CDs.", publisher: "Impromptu Editores, S.L.", year: "2005" },
             { author: "Charles Soler, A.", title: "Instrumentación y orquestación clásica y contemporánea. Vol 1: Viento madera, viento metal y voz.", publisher: "Impromptu Editores, S.L.", year: "2008" },
             { author: "Charles Soler, A.", title: "Instrumentación y orquestación clásica y contemporánea. Vol 3: Instrumentos de cuerda.", publisher: "Impromptu Editores, S.L.", year: "2012" },
             { author: "Chlopecki, O. V.", title: "Arreglos vocales: Técnicas Y Procedimientos.", publisher: "Dirección de Publicaciones y Posgrado, Facultad de Bellas Artes, Universidad Nacional de La Plata.", year: "2010" },
-            { author: "Cooper, G., & Meyer, L. B.", title: "Estructura Ritmica De La Música.", publisher: "Barcelona: Idea Book, S.A.", year: "2000" },
+            { author: "Cooper, G., & Meyer, L. B.", title: "Estructura Rítmica De La Música.", publisher: "Barcelona: Idea Book, S.A.", year: "2000" },
             { author: "Cormier, S. M.", title: "Modal Music Composition.", publisher: "Arlington: Inman & Artz Publishers.", year: "2010" },
             { author: "David P, N.", title: "Solkattu Manual.", publisher: "Wesleyan University Press.", year: "2008" },
             { author: "De Pedro, D.", title: "Teoría Completa De La Música 2.", publisher: "Madrid: Real Musical.", year: "2014" },
@@ -166,8 +172,8 @@
             { author: "Delamont, G.", title: "Modern Arranging Technique.", publisher: "New York: Kendor Music.", year: "1965" },
             { author: "Delamont, G.", title: "Modern Harmony Technique Volumen 1.", publisher: "New York: Kendor Music.", year: "1965" },
             { author: "Delamont, G.", title: "Modern Harmony Technique Volumen 2.", publisher: "New York: Kendor Music.", year: "1965" },
-            { author: "Desportes, Y., & Bernaud, A.", title: "Manual Practico Para El Reconocimiento De Los Estilos Desde Bach A Ravel.", publisher: "Madrid: Real Musical.", year: "1995" },
-            { author: "Díaz Gonzaléz, I.", title: "Técnica De La Armonia Popular Moderna.", publisher: "Habana: Andante.", year: "2003" },
+            { author: "Desportes, Y., & Bernaud, A.", title: "Manual Práctico Para El Reconocimiento De Los Estilos Desde Bach A Ravel.", publisher: "Madrid: Real Musical.", year: "1995" },
+            { author: "Díaz Gonzaléz, I.", title: "Técnica De La Armonía Popular Moderna.", publisher: "Habana: Andante.", year: "2003" },
             { author: "Erikson , F.", title: "Arranging for the Concert Band.", publisher: "Alfred Music.", year: "1985" },
             { author: "Fábregas Pardo, E.", title: "Ritmometría Non Grávida.", publisher: "Cathedra Editorial S.A.S.", year: "2017" },
             { author: "Felts, R.", title: "Reharmonization Technique.", publisher: "Boston: Berklee Press.", year: "2002" },
@@ -175,56 +181,56 @@
             { author: "Forner, J., & Wilbrandt, J.", title: "Contrapunto creativo.", publisher: "Idea Books.", year: "2003" },
             { author: "Forte, A.", title: "The structure of atonal music.", publisher: "USA: Yale University.", year: "1973" },
             { author: "Forte, A., & Gilbert, S. E.", title: "Análisis Musical: Introducción Al Análisis Schenkeriano.", publisher: "Madrid: Idea Books, S.A.", year: "2003" },
-            { author: "Fraga, S.", title: "Teoria Elemental De La Musica.", publisher: "Habana: Min Educacion.", year: "1954" },
+            { author: "Fraga, S.", title: "Teoría Elemental De La Música.", publisher: "Habana: Min Educación.", year: "1954" },
             { author: "Fux´s, J.", title: "The Study Of Counterpoint.", publisher: "New York: W.W. Norton & Company, Inc.", year: "1971" },
             { author: "Fux's, J. J.", title: "The Study Of Counterpoint From JOHANN JOSEPH FUX'S Gradus Ad Parnassum.", publisher: "W • W • NORTON & COMPANY.", year: "1971" },
             { author: "Gabis, C.", title: "Armonía funcional.", publisher: "Melos (Ricordi Americana).", year: "2006" },
             { author: "García Gago, J.", title: "Tratado de contrapunto tonal y atonal.", publisher: "Clivis Publicaciones.", year: "1977" },
-            { author: "García, I. Z.", title: "Temas De Armonia 1. De La Didactica Y Otros Asuntos.", publisher: "Cupulas.", year: "2011" },
-            { author: "García, I. Z.", title: "Claves De Armonía.", publisher: "Museo De La Musica.", year: "2012" },
-            { author: "Gauldin, R.", title: "La Práctica Armonica En La Musica Tonal.", publisher: "Madrid: Akal.", year: "2009" },
+            { author: "García, I. Z.", title: "Temas De Armonía 1. De La Didáctica Y Otros Asuntos.", publisher: "Cúpulas.", year: "2011" },
+            { author: "García, I. Z.", title: "Claves De Armonía.", publisher: "Museo De La Música.", year: "2012" },
+            { author: "Gauldin, R.", title: "La Práctica Armónica En La Música Tonal.", publisher: "Madrid: Akal.", year: "2009" },
             { author: "Gedalge, A.", title: "Tratado De Fuga.", publisher: "Madrid: Real Musical.", year: "1990" },
             { author: "Gerou, T., & Lusk, L.", title: "Essential Dictionary Of Music Notation.", publisher: "Van Nuys: Alfred Publishing Co.", year: "1996" },
             { author: "Gould, E.", title: "Behind Bars.", publisher: "London: Faber Music.", year: "2011" },
-            { author: "Grabner, H.", title: "Teoría General De La Musica.", publisher: "Madrid: Akal.", year: "2001" },
-            { author: "Graetzer, G.", title: "La Musica Contemporánea.", publisher: "Buenos Aires: Ricordi Americana.", year: "1980" },
+            { author: "Grabner, H.", title: "Teoría General De La Música.", publisher: "Madrid: Akal.", year: "2001" },
+            { author: "Graetzer, G.", title: "La Música Contemporánea.", publisher: "Buenos Aires: Ricordi Americana.", year: "1980" },
             { author: "Green, D. M.", title: "Form In Tonal Music.", publisher: "New York: Holt, Rinehart And Winston, Inc.", year: "1965" },
-            { author: "Haba, A.", title: "Nuevo Tratado De Armonia.", publisher: "Madrid: Real Musical.", year: "1979" },
+            { author: "Haba, A.", title: "Nuevo Tratado De Armonía.", publisher: "Madrid: Real Musical.", year: "1979" },
             { author: "Herrera, E.", title: "Teoría musical y armonía moderna 1.", publisher: "Antoni Bosch ed.", year: "1988" },
             { author: "Herrera, E.", title: "Teoría musical y armonía moderna 2.", publisher: "Antoni Bosch ed.", year: "1989" },
-            { author: "Herrera, E.", title: "Tecnicas de Arreglos Para La Orquesta Moderna.", publisher: "Barcelona: Antonic Bosch.", year: "1995" },
+            { author: "Herrera, E.", title: "Técnicas de Arreglos Para La Orquesta Moderna.", publisher: "Barcelona: Antonic Bosch.", year: "1995" },
             { author: "Heussenstamm, G.", title: "The Norton Manual Of Music Notation.", publisher: "New York: W.W. Norton & Company, Inc.", year: "1987" },
-            { author: "Hindemith, P.", title: "Armonia Tradicional.", publisher: "Buenos Aires: Melos.", year: "2007" },
+            { author: "Hindemith, P.", title: "Armonía Tradicional.", publisher: "Buenos Aires: Melos.", year: "2007" },
             { author: "Isler, T.", title: "You Can Ta Ka Di Mi This.", publisher: "Gerard & Sarzin Publishing Co.", year: "2005" },
             { author: "Johnson, M.", title: "Finale 2014 A Trailblazer Guide.", publisher: "Bloomington: Penelope Press.", year: "2013" },
-            { author: "Jurafsky, A.", title: "Manual De Armonia.", publisher: "Buenos Aires: Ricordi Americana.", year: "1946" },
+            { author: "Jurafsky, A.", title: "Manual De Armonía.", publisher: "Buenos Aires: Ricordi Americana.", year: "1946" },
             { author: "Karkoschka, E.", title: "Notation in the New Music.", publisher: "London: Universal Edition.", year: "1972" },
             { author: "Kawakami, G.", title: "Arranging Popular Music a Practical Guide.", publisher: "Tokyo: Yamaha Music Foundation.", year: "1975" },
             { author: "Kennan, K.", title: "Counterpoint.", publisher: "Nueva Jersey: Prentice-Hall,Inc.", year: "1999" },
-            { author: "Kórsakov, N. R.", title: "Tratado Practica De Armonia.", publisher: "Buenos Aires: Ricordi Americana.", year: "1997" },
+            { author: "Kórsakov, N. R.", title: "Tratado Práctica De Armonía.", publisher: "Buenos Aires: Ricordi Americana.", year: "1997" },
             { author: "Kostka, S., Payne, D., & Almén, B.", title: "Tonal Harmony With An Introduction To Post-Tonal Music, Eighth Edition.", publisher: "New York: McGraw-Hill Education.", year: "2018" },
-            { author: "Lárez, V.", title: "Armonia I.", publisher: "Caracas: Universidad Nacional Experimental De Las Artes - Unearte.", year: "2011" },
-            { author: "Lárez, V.", title: "Armonia II.", publisher: "Caracas: Universidad Nacional Experimental De Las Artes - Unearte.", year: "2011" },
-            { author: "Latham, A.", title: "Diccionario Enciclopedico De La Musica.", publisher: "Mexico: D.R.", year: "2008" },
+            { author: "Lárez, V.", title: "Armonía I.", publisher: "Caracas: Universidad Nacional Experimental De Las Artes - Unearte.", year: "2011" },
+            { author: "Lárez, V.", title: "Armonía II.", publisher: "Caracas: Universidad Nacional Experimental De Las Artes - Unearte.", year: "2011" },
+            { author: "Latham, A.", title: "Diccionario Enciclopédico De La Música.", publisher: "Mexico: D.R.", year: "2008" },
             { author: "Lendvai, E.", title: "Béla Bartok: un análisis de su música.", publisher: "Idea Books.", year: "2003" },
-            { author: "Lester, J.", title: "Enfoques analíticos de la música del siglo XX.", publisher: "Akal, Ediciones.", year: "2005" },
+            { author: "Lester, J.", title: "Enfoques Analíticos de la Música del Siglo XX.", publisher: "Akal, Ediciones.", year: "2005" },
             { author: "Lindsay, G.", title: "Jazz Arranging Techniques.", publisher: "Miami: Staff Art Publishing.", year: "2005" },
             { author: "Lorenzo, T.", title: "El arreglo. Un puzzle de expresión musical.", publisher: "J.M. Bosch Editor.", year: "2005" },
             { author: "Mas Devesa, M.", title: "Fundamentos De Composición.", publisher: "Rivera Editores.", year: "2007" },
             { author: "Meyer, L. B.", title: "La Emoción Y El Significado En La Música.", publisher: "Madrid: Alianza Editorial.", year: "2009" },
             { author: "Michels, U.", title: "Atlas De Música, I.", publisher: "Madrid: Ed. Cast: Alianza Editorial, S.A.", year: "1985" },
             { author: "Miller, R.", title: "Modal Jazz Composition & Harmony Volumen 1.", publisher: "Rottenburg N., Germany: Advance Music.", year: "1996" },
-            { author: "Moralinto, O. E.", title: "Libro De Los Libros ó Ramillete de Máximas, Pensamientos Y Dichos Sentenciosos, Agudos ó Memorable.", publisher: "Barcelona.", year: "1841" },
+            { author: "Moralinto, O. E.", title: "Libro De Los Libros ó Ramillete de Máximas, Pensamientos Y Dichos Sentenciosos, Agudos ó Memorables.", publisher: "Barcelona.", year: "1841" },
             { author: "Mulholland, J., & Hojnackí, T.", title: "The Berklee Book Of Jazz Harmony.", publisher: "Boston: Berklee Press.", year: "2013" },
             { author: "Nestico , S.", title: "The Complete Arranger.", publisher: "Fenwood Music Co.", year: "2007" },
             { author: "Nettles, B.", title: "Harmony 1.", publisher: "Boston: Fall Edition.", year: "2006" },
             { author: "Nettles, B., & Graf, R.", title: "The Chord Scale Theory & Jazz Harmony.", publisher: "Mainz: Advance Music.", year: "1997" },
             { author: "Norden, H.", title: "The Technique Of Canon.", publisher: "Wellesley: Branden Books.", year: "2009" },
-            { author: "Orejuela Arias, J. E.", title: "El Arte De La Modulación.", publisher: "Medellin: Fondo Editorial Cooperativo.", year: "1996" },
+            { author: "Orejuela Arias, J. E.", title: "El Arte De La Modulación.", publisher: "Medellín: Fondo Editorial Cooperativo.", year: "1996" },
             { author: "Ortiz Morales, J. M.", title: "Manual de Iniciación a la Armonía.", publisher: "Málaga : AMP Ediciones. http://ommalaga.com/Conservatorio/Textos/CifradoMusical.pdf", year: "2006" },
-            { author: "Ottman, R. W.", title: "Advance Harmony: Theory And Practice.", publisher: "New Yersey: Prentice-Hall.", year: "2012" },
+            { author: "Ottman, R. W.", title: "Advance Harmony: Theory And Practice.", publisher: "New Jersey: Prentice-Hall.", year: "2012" },
             { author: "Ottman, R. W.", title: "Elementary Harmony: Theory And Practice.", publisher: "New Jersey: Prentice-Hall.", year: "2012" },
-            { author: "Padilla Rincón, J. C.", title: "Armonia 1.", publisher: "Bogota: Escuela De Musica Fernando Sor.", year: "2014" },
+            { author: "Padilla Rincón, J. C.", title: "Armonía 1.", publisher: "Bogotá: Escuela De Música Fernando Sor.", year: "2014" },
             { author: "Pease, T.", title: "Jazz Composition.", publisher: "Berklee Press.", year: "2003" },
             { author: "Pease, T., & Pullig, K.", title: "Modern Jazz Voicings.", publisher: "Berklee Guide.", year: "2001" },
             { author: "Perle, G.", title: "Composición Serial Y Atonalidad.", publisher: "Barcelona: Idea Book, S.A.", year: "1999" },
@@ -235,10 +241,10 @@
             { author: "Pullig , K., & Lowell , D.", title: "Arranging for Large Jazz Ensemble.", publisher: "Berklee Press.", year: "2003" },
             { author: "Rameau, J. P.", title: "Treatise On Harmony.", publisher: "New York: Dover Books on Music.", year: "1971" },
             { author: "Read, G.", title: "Music Notation. A Manual Of Modern Practice.", publisher: "New York: Crescendo Book.", year: "1979" },
-            { author: "Reger, M.", title: "Contribuciones Al Estudio De La Modulacion.", publisher: "Madrid: Real Musical.", year: "1978" },
+            { author: "Reger, M.", title: "Contribuciones Al Estudio De La Modulación.", publisher: "Madrid: Real Musical.", year: "1978" },
             { author: "Reina, R.", title: "Applying Karnatic Rhythmical Techniques To Western Music.", publisher: "Ashgate.", year: "2015" },
             { author: "Reti, R.", title: "Tonalidad, Atonalidad, Pantonalidad.", publisher: "Madrid: Rialp S. A.", year: "1965" },
-            { author: "Riemann, H.", title: "Armonia Y Modulación.", publisher: "Madrid: Labor S.A.", year: "1952" },
+            { author: "Riemann, H.", title: "Armonía Y Modulación.", publisher: "Madrid: Labor S.A.", year: "1952" },
             { author: "Risatti, H.", title: "New Music Vocabulary.", publisher: "Nevada St.: university of illinois.", year: "1976" },
             { author: "Rivera, J.", title: "Advanced Rhythmic Concepts For Guitar.", publisher: "Violet Anamnesis Publications.", year: "2014" },
             { author: "Roig-Francolí, M. A.", title: "Understanding Post-Tonal Music.", publisher: "New York: McGraw-Hill.", year: "2008" },
@@ -247,41 +253,111 @@
             { author: "Romero, G., Lazorczyk, M., & Aguilera, P.", title: "Escucha-Imagina-Representa 1 (Alumno).", publisher: "Dinsic.", year: "2015" },
             { author: "Romero, G., Lazorczyk, M., & Aguilera, P.", title: "Escucha Imagina Representa Vol. 2 (Profesor).", publisher: "Dinsic.", year: "2018" },
             { author: "Romero, G., Lazorczyk, M., & Aguilera, P.", title: "Escucha-Imagina-Representa 2 (Alumno).", publisher: "Dinsic.", year: "2018" },
-            { author: "Romeu, A.", title: "Curso Armonia y Orquestacion.", publisher: "La Habana.", year: "n.d." },
+            { author: "Romeu, A.", title: "Curso Armonía y Orquestación.", publisher: "La Habana.", year: "n.d." },
             { author: "Roncero, V.", title: "Teoría Del Lenguaje Musical.", publisher: "Valencia: Piles.", year: "2013" },
             { author: "Russo, W., Ainis, J., & Stevenson, D.", title: "Composing Music. A new Approach.", publisher: "Chicago: University Of Chicago Press Edition.", year: "1983" },
             { author: "Saenz, P.", title: "Armonía. Método Teórico-Práctico.", publisher: "Madrid: Real Musical.", year: "1978" },
             { author: "Salzer, F., & Schachter, C.", title: "El contrapunto en la composición: el estudio de la conducción de las voces.", publisher: "Idea Books.", year: "1999" },
             { author: "Sarmiento, P. A.", title: "es.slideshare.net.", publisher: "https://es.slideshare.net/escuela114/las-especies-del-contrapunto", year: "2007" },
-            { author: "Schenker, H.", title: "Tratado De Armonia.", publisher: "Madrid: Real Musical.", year: "1990" },
+            { author: "Schenker, H.", title: "Tratado De Armonía.", publisher: "Madrid: Real Musical.", year: "1990" },
             { author: "Schoenberg, A.", title: "Ejercicios Preliminares De Contrapunto.", publisher: "Editorial Labor, S.A.", year: "1990" },
             { author: "Schönberg, A.", title: "Fundamentos De La Composición Musical.", publisher: "Madrid: Real Musical.", year: "1989" },
-            { author: "Shoenberg, A.", title: "Tratado De Armonia.", publisher: "Madrid: Real Musical.", year: "1974" },
-            { author: "Shoenberg, A.", title: "Funciones Estructurales De La Armonia.", publisher: "Barcelona: Labor. S.A.", year: "1990" },
+            { author: "Shoenberg, A.", title: "Tratado De Armonía.", publisher: "Madrid: Real Musical.", year: "1974" },
+            { author: "Shoenberg, A.", title: "Funciones Estructurales De La Armonía.", publisher: "Barcelona: Labor. S.A.", year: "1990" },
             { author: "Smith Brindle, R.", title: "Musical Composition.", publisher: "New York: Oxford University Press.", year: "1986" },
-            { author: "Soler, J.", title: "Fuga Tecnica E Historia.", publisher: "Barcelona: Antoni Bosch .", year: "1998" },
+            { author: "Soler, J.", title: "Fuga Técnica E Historia.", publisher: "Barcelona: Antoni Bosch .", year: "1998" },
             { author: "Stone, K.", title: "Music Notation In The Twentieth Century.", publisher: "New York: W.W. Norton & Company, Inc.", year: "1980" },
             { author: "Straus, J. N.", title: "Introduction to Post-Tonal Theory (4th Edition).", publisher: "W. W. Norton & Company.", year: "2016" },
             { author: "Tchaikovsky, P. I.", title: "Guide To The Practical Study Of Harmony.", publisher: "Leipzig: P. Jurgenson.", year: "1900" },
-            { author: "Toch, E.", title: "Elementos constitutivos de la música.", publisher: "Barcelona: Idea Book S.A.", year: "2001" },
+            { author: "Toch, E.", title: "Elementos constitutivos de la Música.", publisher: "Barcelona: Idea Book S.A.", year: "2001" },
             { author: "Toro Echeverri, J. C.", title: "Repositorio Institucional Universidad EAFIT.", publisher: "https://repository.eafit.edu.co/handle/10784/515", year: "2012" },
-            { author: "Ulehla, L.", title: "Comtemporary Harmony.", publisher: "Advance Music.", year: "1994" },
+            { author: "Ulehla, L.", title: "Contemporary Harmony.", publisher: "Advance Music.", year: "1994" },
             { author: "Valencia Rincón, V. F.", title: "Cartilla de Arreglos Para Banda Nivel 1.", publisher: "Ministerio de Cultura.", year: "2005" },
             { author: "Vergés, L.", title: "El lenguaje de la armonía: de los inicios a la actualidad.", publisher: "Boileau, Editorial de Música.", year: "2007" },
             { author: "Vergés, L.", title: "El lenguaje de la armonía: de los inicios a la actualidad. Libro de ejercicios.", publisher: "Boileau, Editorial de Música.", year: "2011" },
-            { author: "Villa Rojo, J.", title: "Notacion Y Grafia Musical En El Siglo XX.", publisher: "Madrid: Iberautor Promociones Culturales.", year: "2003" },
-            { author: "Williams, A.", title: "Teoria De La Música.", publisher: "Buenos Aires: La Quena.", year: "1981" },
+            { author: "Villa Rojo, J.", title: "Notación Y Grafía Musical En El Siglo XX.", publisher: "Madrid: Iberautor Promociones Culturales.", year: "2003" },
+            { author: "Williams, A.", title: "Teoría De La Música.", publisher: "Buenos Aires: La Quena.", year: "1981" },
             { author: "Wright , R.", title: "Inside the Score.", publisher: "KendorMusic.", year: "1982" },
-            { author: "Yepes Londoño, G.", title: "Tratado Del Lenguaje Tonal.", publisher: "Bogota: Autoreseditores.com.", year: "2014" },
-            { author: "Zamacois, J.", title: "Teoria De La Musica Dividida En Cursos.", publisher: "Barcelona: Labor, S.A.", year: "1986" },
-            { author: "Zamacois, J.", title: "Tratado De Armonia I.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" },
-            { author: "Zamacois, J.", title: "Tratado De Armonia II.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" },
-            { author: "Zamacois, J.", title: "Tratado de Armonia III.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" }
+            { author: "Yepes Londoño, G.", title: "Tratado Del Lenguaje Tonal.", publisher: "Bogotá: Autoreseditores.com.", year: "2014" },
+            { author: "Zamacois, J.", title: "Teoría De La Música Dividida En Cursos.", publisher: "Barcelona: Labor, S.A.", year: "1986" },
+            { author: "Zamacois, J.", title: "Tratado De Armonía I.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" },
+            { author: "Zamacois, J.", title: "Tratado De Armonía II.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" },
+            { author: "Zamacois, J.", title: "Tratado de Armonía III.", publisher: "Barcelona: Idea Books, S.A.", year: "2002" }
         ];
 
         const searchInput = document.getElementById('search');
         const filterSelect = document.getElementById('filter');
+        const citationStyleSelect = document.getElementById('citation-style'); // Nuevo selector
         const bibliographyList = document.getElementById('bibliography-list');
+
+        // Función para formatear el nombre del autor para APA, Chicago e ICONTEC
+        function formatAuthorName(authorString, style) {
+            const authors = authorString.split(',').map(name => name.trim());
+            let formattedAuthors = [];
+
+            if (style === 'apa7') {
+                for (let i = 0; i < authors.length; i++) {
+                    const parts = authors[i].split(' ');
+                    const lastName = parts[0];
+                    const initials = parts.slice(1).map(part => part[0] + '.').join('');
+                    formattedAuthors.push(`${lastName}, ${initials}`);
+                }
+                if (formattedAuthors.length > 1) {
+                    const lastAuthor = formattedAuthors.pop();
+                    return formattedAuthors.join(', ') + ' & ' + lastAuthor;
+                }
+                return formattedAuthors[0];
+            } else if (style === 'chicago') {
+                for (let i = 0; i < authors.length; i++) {
+                    const parts = authors[i].split(' ');
+                    const lastName = parts[0];
+                    const firstName = parts.slice(1).join(' '); // Simple join for first name
+                    formattedAuthors.push(`${lastName}, ${firstName}`);
+                }
+                if (formattedAuthors.length > 1) {
+                    const lastAuthor = formattedAuthors.pop();
+                    return formattedAuthors.join(', ') + ', and ' + lastAuthor;
+                }
+                return formattedAuthors[0];
+            } else if (style === 'icontec') {
+                // ICONTEC: APELLIDO, Nombre; APELLIDO, Nombre.
+                for (let i = 0; i < authors.length; i++) {
+                    const parts = authors[i].split(' ');
+                    const lastName = parts[0].toUpperCase(); // Apellido en mayúsculas
+                    const firstName = parts.slice(1).join(' ');
+                    formattedAuthors.push(`${lastName}, ${firstName}`);
+                }
+                return formattedAuthors.join('; ');
+            }
+            return authorString; // Default for original style
+        }
+
+        // Función para formatear un elemento de la bibliografía según el estilo seleccionado
+        function formatBibliographyItem(item, style) {
+            switch (style) {
+                case 'apa7':
+                    const apaAuthor = formatAuthorName(item.author, 'apa7');
+                    const apaYear = item.year === 'n.d.' ? '(s.f.).' : `(${item.year}).`; // s.f. para sin fecha
+                    return `${apaAuthor} ${apaYear} <i>${item.title}</i>. ${item.publisher}`;
+                case 'chicago':
+                    const chicagoAuthor = formatAuthorName(item.author, 'chicago');
+                    const chicagoYear = item.year === 'n.d.' ? '' : `, ${item.year}`;
+                    // Chicago often omits place if publisher includes it, but for simplicity, we'll keep publisher as is.
+                    return `${chicagoAuthor}. <i>${item.title}</i>. ${item.publisher}${chicagoYear}.`;
+                case 'icontec':
+                    const icontecAuthor = formatAuthorName(item.author, 'icontec');
+                    const icontecYear = item.year === 'n.d.' ? '' : `, ${item.year}`;
+                    // ICONTEC: APELLIDO, Nombre. TÍTULO. Ciudad: Editorial, Año.
+                    // Assuming publisher field contains "Ciudad: Editorial."
+                    return `${icontecAuthor}. <i>${item.title}</i>. ${item.publisher}${icontecYear}.`;
+                case 'original':
+                default:
+                    return `<strong>Autor:</strong> <span>${item.author}</span><br>
+                            <strong>Título:</strong> <span>${item.title}</span><br>
+                            <strong>Editorial/Lugar:</strong> <span>${item.publisher}</span><br>
+                            <strong>Año:</strong> <span>${item.year}</span>`;
+            }
+        }
 
         // Función para renderizar la bibliografía
         function renderBibliography(data) {
@@ -290,15 +366,11 @@
                 bibliographyList.innerHTML = '<div class="no-results">No se encontraron resultados.</div>';
                 return;
             }
+            const selectedStyle = citationStyleSelect.value; // Obtener el estilo seleccionado
             data.forEach(item => {
                 const div = document.createElement('div');
                 div.classList.add('bibliography-item');
-                div.innerHTML = `
-                    <p><strong>Autor:</strong> <span>${item.author}</span></p>
-                    <p><strong>Título:</strong> <span>${item.title}</span></p>
-                    <p><strong>Editorial/Lugar:</strong> <span>${item.publisher}</span></p>
-                    <p><strong>Año:</strong> <span>${item.year}</span></p>
-                `;
+                div.innerHTML = formatBibliographyItem(item, selectedStyle); // Usar la función de formato
                 bibliographyList.appendChild(div);
             });
         }
@@ -317,7 +389,8 @@
                         item.year.toLowerCase().includes(searchTerm)
                     );
                 } else {
-                    return item[filterBy].toLowerCase().includes(searchTerm);
+                    // Ensure the property exists before calling toLowerCase()
+                    return item[filterBy] && item[filterBy].toLowerCase().includes(searchTerm);
                 }
             });
             renderBibliography(filteredData);
@@ -326,6 +399,7 @@
         // Event Listeners
         searchInput.addEventListener('input', filterAndSearch);
         filterSelect.addEventListener('change', filterAndSearch);
+        citationStyleSelect.addEventListener('change', filterAndSearch); // Escuchar cambios en el estilo de citación
 
         // Renderizar la bibliografía inicial al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
